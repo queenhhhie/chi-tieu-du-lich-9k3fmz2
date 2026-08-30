@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chi tiêu">
+<meta name="theme-color" content="#0E1A24">
+<title>Chi tiêu du lịch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --board:#0E1A24;--board2:#17262F;--paper:#E9EDF0;--card:#fff;
+  --amber:#F5B544;--teal:#0F7C74;--coral:#DE5B4E;--ink:#132029;--muted:#6B7A87;--line:#D8DEE3;
+}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);
+  padding-bottom:calc(96px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:520px;margin:0 auto}
+.cond{font-family:'Barlow Condensed','Oswald',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.num{font-variant-numeric:tabular-nums}
+
+.board{background:var(--board);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 18px 20px;border-bottom:3px solid var(--amber)}
+.board-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.trip-btn{background:var(--board2);color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:7px;
+  padding:8px 11px;font-size:13px;font-weight:600;font-family:inherit;max-width:230px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.eyebrow{font-size:11px;color:rgba(255,255,255,.55)}
+.total{font-family:'Barlow Condensed','Oswald',system-ui,sans-serif;font-size:52px;line-height:1;font-weight:700;color:var(--amber);margin-top:8px}
+.sub{display:flex;gap:20px;margin-top:10px;font-size:12px;color:rgba(255,255,255,.7)}
+.sub b{display:block;font-size:15px;color:#fff;font-weight:600;margin-top:2px}
+.track{height:6px;background:rgba(255,255,255,.14);border-radius:99px;margin-top:14px;overflow:hidden;position:relative}
+.track i{display:block;height:100%;border-radius:99px;top:0;left:0}
+.warn{margin-top:10px;background:rgba(222,91,78,.16);border:1px solid rgba(222,91,78,.5);color:#FFC9C2;
+  border-radius:8px;padding:8px 10px;font-size:12px}
+
+.pad{padding:16px}
+.sec{font-size:12px;color:var(--muted);font-weight:600;margin:22px 0 8px}
+.sec:first-child{margin-top:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:28px 20px;
+  text-align:center;color:var(--muted);font-size:14px}
+
+.daybar{display:flex;justify-content:space-between;align-items:baseline;padding:14px 2px 6px;font-size:13px}
+.daybar .s{color:var(--muted)}
+.row{display:flex;gap:11px;align-items:center;padding:11px 12px;background:var(--card);
+  border:1px solid var(--line);border-radius:11px;margin-bottom:7px;width:100%;text-align:left;font-family:inherit}
+.row:active{background:#F7F9FA}
+.ic{width:36px;height:36px;border-radius:9px;background:var(--paper);display:grid;place-items:center;font-size:17px;flex:0 0 auto}
+.mid{flex:1;min-width:0}
+.t1{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t2{font-size:11.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.amt{text-align:right;flex:0 0 auto}
+.a1{font-size:14.5px;font-weight:700}
+.a2{font-size:11px;color:var(--muted);margin-top:2px}
+
+.bar{height:7px;background:var(--paper);border-radius:99px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--teal)}
+
+.lbl{display:block;font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:6px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px;
+  font-size:16px;font-family:inherit;background:#fff;color:var(--ink);-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:-1px}
+.field{margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 13px;font-size:13px;
+  font-family:inherit;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.note{background:#FFF7E6;border:1px solid #F0DCA8;border-radius:9px;padding:9px 11px;font-size:12px;color:#6C5310}
+
+button{cursor:pointer}
+.btn{width:100%;border:0;border-radius:10px;padding:14px;font-size:15px;font-weight:600;font-family:inherit;
+  background:var(--ink);color:#fff}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:#fff;color:var(--coral);border:1px solid #F0C4BF}
+.btn.sm{padding:9px 12px;font-size:13px;width:auto;white-space:nowrap}
+.x{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;color:var(--muted);font-family:inherit;font-size:13px}
+
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:40;
+  background:var(--amber);color:#22160A;border:0;border-radius:99px;padding:14px 22px;font-size:15px;font-weight:700;
+  font-family:inherit;box-shadow:0 8px 22px rgba(14,26,36,.28)}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:41;background:#fff;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(4,1fr);padding:9px 0 calc(9px + env(safe-area-inset-bottom))}
+.tab{border:0;background:none;font-family:inherit;font-size:11px;color:var(--muted);font-weight:600;padding:4px 0}
+.tab.on{color:var(--ink)}
+
+.scrim{position:fixed;inset:0;background:rgba(14,26,36,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);width:100%;max-width:520px;max-height:92vh;overflow:auto;
+  border-radius:16px 16px 0 0;padding:16px 16px calc(28px + env(safe-area-inset-bottom))}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sheet-head h3{margin:0;font-size:17px}
+
+.lrow{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line);font-size:14px}
+.lrow:last-child{border-bottom:0}
+.grow{flex:1;min-width:0}
+.hint{font-size:11.5px;color:var(--muted);margin-top:2px}
+.addrow{display:flex;gap:8px;padding:11px 13px;border-top:1px solid var(--line)}
+.rate-in{width:110px;text-align:right;padding:8px 9px;font-size:14px}
+.dot{width:10px;height:10px;border-radius:99px;display:inline-block}
+
+.bars{display:flex;align-items:flex-end;gap:6px;height:150px;padding:8px 4px 0}
+.bars .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:2px}
+.bars .col i{display:block;width:100%}
+.blabels{display:flex;gap:6px;padding:6px 4px 0}
+.blabels span{flex:1;text-align:center;font-size:10px;color:var(--muted)}
+.seg{display:flex;gap:6px}
+.seg button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 13px;font-size:12.5px;
+  font-family:inherit;color:var(--muted);white-space:nowrap;font-weight:600}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.segwrap{display:flex;flex-direction:column;gap:8px;margin:4px 0 14px}
+.seglbl{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:-2px}
+.row.plan{border-style:dashed;background:#FFFCF4}
+.tag{font-size:9.5px;font-weight:700;letter-spacing:.06em;color:#B07A12;background:#FBEBCC;
+  border-radius:4px;padding:2px 5px;margin-left:6px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom));
+  background:var(--ink);color:#fff;padding:10px 16px;border-radius:99px;font-size:13px;z-index:60;opacity:0;
+  transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ dữ liệu ============ */
+const KEY = 'chi-tieu-du-lich-v1';
+const uid = () => Math.random().toString(36).slice(2,9);
+
+const DEF_CATS = [
+  {id:'move',name:'Di chuyển',icon:'🚆'},
+  {id:'stay',name:'Chỗ ở',icon:'🏨'},
+  {id:'food',name:'Ăn uống',icon:'🍽️'},
+  {id:'fun',name:'Tham quan & hoạt động',icon:'🎟️'},
+  {id:'shop',name:'Shopping',icon:'🛍️'},
+  {id:'fee',name:'Phí & thủ tục',icon:'📄'},
+  {id:'misc',name:'Khác',icon:'✨'}
+];
+const DEF_METHODS = [
+  {id:'amex',name:'Amex'},
+  {id:'monzo',name:'Monzo Credit Card'},
+  {id:'cash_gbp',name:'Tiền mặt GBP'},
+  {id:'cash_eur',name:'Tiền mặt EUR'},
+  {id:'wise',name:'Wise'}
+];
+const DEF_CURS = [
+  {code:'GBP',rate:1},{code:'EUR',rate:1.16},{code:'USD',rate:1.28},{code:'VND',rate:33000}
+];
+
+function seed(){
+  const t = {id:uid(),name:'Belgium & Paris',budgetTotal:0};
+  return {trips:[t],activeTripId:t.id,categories:DEF_CATS,methods:DEF_METHODS,currencies:DEF_CURS,expenses:[]};
+}
+
+let S, storeOK = true, storeMsg = '';
+let ui = {tab:'chi', filter:'all', sort:'time'};
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const p = JSON.parse(raw); if(p && p.trips) return p; }
+  }catch(e){ storeOK=false; storeMsg=String(e.message||e); }
+  return seed();
+}
+function save(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(S));
+    storeOK = true; storeMsg = '';
+  }catch(e){
+    storeOK = false; storeMsg = String(e.message||e);
+  }
+}
+
+/* ============ tiện ích ============ */
+const gbp = n => '£' + (Number(n)||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money = (n,c) => (Number(n)||0).toLocaleString('en-GB',{minimumFractionDigits:c==='VND'?0:2,maximumFractionDigits:c==='VND'?0:2}) + ' ' + c;
+const toBase = e => { const r = Number(e.rate)||1; return (Number(e.amount)||0)/(r===0?1:r); };
+const dayKey = dt => (dt||'').slice(0,10);
+const timeLabel = dt => (dt||'').slice(11,16);
+function dayLabel(k){
+  if(!k) return '';
+  const [y,m,d] = k.split('-');
+  const names = ['CN','T2','T3','T4','T5','T6','T7'];
+  return names[new Date(+y,+m-1,+d).getDay()] + ' ' + d + '/' + m;
+}
+function localNow(){
+  const d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  return d.toISOString().slice(0,16);
+}
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const trip = () => S.trips.find(t=>t.id===S.activeTripId) || S.trips[0];
+const tripExpenses = () => S.expenses.filter(e=>e.tripId===trip().id).sort((a,b)=> a.datetime<b.datetime?1:-1);
+const actuals = () => tripExpenses().filter(e=>!e.planned);
+const plans = () => tripExpenses().filter(e=>e.planned).reverse();
+const catOf = id => S.categories.find(c=>c.id===id);
+const methodOf = id => S.methods.find(m=>m.id===id);
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('on'), 1600);
+}
+
+/* ============ vẽ giao diện ============ */
+function render(){
+  const t = trip();
+  const ex = actuals();
+  const pl = plans();
+  const spent = ex.reduce((s,e)=>s+toBase(e),0);
+  const planLeft = pl.reduce((s,e)=>s+toBase(e),0);
+  const forecast = spent + planLeft;
+  const budget = Number(t.budgetTotal)||0;
+  const pct = budget>0 ? Math.min(100,(spent/budget)*100) : 0;
+  const fpct = budget>0 ? Math.min(100,(forecast/budget)*100) : 0;
+  const over = budget>0 && spent>budget;
+  const willOver = budget>0 && !over && forecast>budget;
+
+  let body = '';
+  if(ui.tab==='chi') body = viewExpenses(ex,pl);
+  else if(ui.tab==='ngan-sach') body = viewBudget(ex,pl,spent,planLeft,budget);
+  else if(ui.tab==='bieu-do') body = viewCharts(ex,pl,spent,planLeft);
+  else body = viewSettings();
+
+  document.getElementById('app').innerHTML = `
+    <div class="board"><div class="wrap">
+      <div class="board-top">
+        <button class="trip-btn" data-act="trips">${esc(t.name)} ⌄</button>
+        <div style="text-align:right">
+          <div class="eyebrow cond">Khoản chi</div>
+          <div class="num" style="font-size:17px;font-weight:700">${ex.length}</div>
+        </div>
+      </div>
+      <div class="eyebrow cond" style="margin-top:14px">Thực chi · quy đổi GBP</div>
+      <div class="total num">${gbp(spent)}</div>
+      <div class="sub">
+        <div><span class="cond">Ngân sách</span><b class="num">${budget>0?gbp(budget):'—'}</b></div>
+        <div><span class="cond">Dự kiến</span><b class="num" style="${planLeft>0?'color:#F5B544':''}">${gbp(planLeft)}</b></div>
+        <div><span class="cond">Còn lại</span><b class="num" style="${budget>0&&budget-spent-planLeft<0?'color:#FF9C90':''}">${budget>0?gbp(budget-spent-planLeft):'—'}</b></div>
+      </div>
+      ${budget>0?`<div class="track">
+        <i style="width:${fpct}%;background:rgba(245,181,68,.45);position:absolute"></i>
+        <i style="width:${pct}%;background:${over?'#DE5B4E':'#3FBFA8'};position:relative"></i>
+      </div>`:''}
+      ${over?`<div class="warn">⚠︎ Vượt ngân sách ${gbp(spent-budget)}</div>`:''}
+      ${willOver?`<div class="warn">⚠︎ Tính cả khoản dự kiến thì vượt ${gbp(forecast-budget)}</div>`:''}
+      ${(!over&&!willOver&&budget>0&&pct>=80)?`<div class="warn">⚠︎ Đã dùng ${Math.round(pct)}% ngân sách</div>`:''}
+      ${!storeOK?`<div class="warn">⚠︎ Safari không lưu được (${esc(storeMsg)}). Kiểm tra: Cài đặt → Safari → tắt "Chặn tất cả cookie", và không dùng Tab riêng tư.</div>`:''}
+    </div></div>
+    <div class="wrap pad">${body}</div>
+    ${ui.tab!=='cai-dat'?`<button class="fab" data-act="add">+ Thêm khoản chi</button>`:''}
+    <nav class="tabs">
+      ${[['chi','Chi tiêu'],['ngan-sach','Ngân sách'],['bieu-do','Biểu đồ'],['cai-dat','Cài đặt']]
+        .map(([k,l])=>`<button class="tab ${ui.tab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}
+    </nav>`;
+  bind();
+}
+
+function expRow(e){
+  const c = catOf(e.categoryId), m = methodOf(e.methodId);
+  return `<button class="row ${e.planned?'plan':''}" data-edit="${e.id}">
+    <span class="ic">${c?c.icon:'•'}</span>
+    <span class="mid">
+      <span class="t1" style="display:block">${esc(e.desc || (c?c.name:'Khoản chi'))}${e.planned?'<span class="tag">DỰ TRÙ</span>':''}</span>
+      <span class="t2" style="display:block">${e.planned?dayLabel(dayKey(e.datetime)):timeLabel(e.datetime)} · ${esc(c?c.name:'—')} · ${esc(m?m.name:'—')}</span>
+    </span>
+    <span class="amt">
+      <span class="a1 num" style="display:block;${e.planned?'color:#B07A12':''}">${gbp(toBase(e))}</span>
+      ${e.currency!=='GBP'?`<span class="a2 num" style="display:block">${money(e.amount,e.currency)}</span>`:''}
+    </span></button>`;
+}
+
+function viewExpenses(ex,pl){
+  const seg = `<div class="segwrap">
+    <div class="seglbl">Hiện</div>
+    <div class="seg">
+      ${[['all','Tất cả'],['actual','Thực chi'],['plan','Dự trù']].map(([k,l])=>
+        `<button data-filter="${k}" class="${ui.filter===k?'on':''}">${l}</button>`).join('')}
+    </div>
+    <div class="seglbl">Sắp xếp</div>
+    <div class="seg">
+      ${[['time','Theo thời gian'],['cat','Theo hạng mục']].map(([k,l])=>
+        `<button data-sort="${k}" class="${ui.sort===k?'on':''}">${l}</button>`).join('')}
+    </div>
+  </div>`;
+
+  let list = ui.filter==='plan' ? pl : ui.filter==='actual' ? ex : ex.concat(pl);
+  if(!list.length){
+    const msg = ui.filter==='plan' ? 'Chưa có khoản dự trù nào. Thêm khoản chi rồi chọn "Dự trù" để ghi trước những thứ bạn biết sẽ phải trả.'
+      : ui.filter==='actual' ? 'Chưa ghi khoản thực chi nào.'
+      : 'Chưa có khoản chi nào.<br>Bấm <b>Thêm khoản chi</b> để bắt đầu.';
+    return seg + `<div class="empty">${msg}</div>`;
+  }
+
+  if(ui.sort==='cat'){
+    const groups = S.categories.map(c=>({
+      c, items: list.filter(e=>e.categoryId===c.id).sort((a,b)=> a.datetime<b.datetime?1:-1)
+    })).filter(g=>g.items.length)
+      .sort((a,b)=> b.items.reduce((s,e)=>s+toBase(e),0) - a.items.reduce((s,e)=>s+toBase(e),0));
+    return seg + groups.map(g=>`
+      <div class="daybar"><span style="font-weight:700">${g.c.icon} ${esc(g.c.name)}</span>
+        <span class="s num">${gbp(g.items.reduce((s,e)=>s+toBase(e),0))}</span></div>
+      ${g.items.map(expRow).join('')}`).join('');
+  }
+
+  list = list.slice().sort((a,b)=> a.datetime<b.datetime?1:-1);
+  const days = [];
+  list.forEach(e=>{
+    const k = dayKey(e.datetime);
+    let d = days.find(x=>x.key===k);
+    if(!d) days.push(d={key:k,items:[]});
+    d.items.push(e);
+  });
+  return seg + days.map(d=>`
+    <div class="daybar"><span class="cond" style="font-weight:700">${dayLabel(d.key)}</span>
+      <span class="s num">${gbp(d.items.reduce((s,e)=>s+toBase(e),0))}</span></div>
+    ${d.items.map(expRow).join('')}`).join('');
+}
+
+function viewBudget(ex,pl,spent,planLeft,budget){
+  const over = budget>0 && spent>budget;
+  const byCat = {};
+  ex.forEach(e=>byCat[e.categoryId]=(byCat[e.categoryId]||0)+toBase(e));
+  const rows = S.categories.map(c=>({...c,value:byCat[c.id]||0})).filter(c=>c.value>0).sort((a,b)=>b.value-a.value);
+  return `
+    <div class="sec">Ngân sách cả chuyến</div>
+    <div class="card" style="padding:14px">
+      <label class="lbl">Mình dự định tiêu bao nhiêu? (GBP)</label>
+      <input id="budget-in" class="num" type="number" inputmode="decimal" placeholder="VD: 1300"
+        value="${budget||''}" style="font-size:20px;font-weight:700;padding:13px 12px">
+      ${budget>0?`
+        <div class="bar" style="height:9px;margin-top:14px"><i style="width:${Math.min(100,(spent/budget)*100)}%;background:${over?'#DE5B4E':'#0F7C74'}"></i></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-top:12px"><span>Đã tiêu</span><b class="num">${gbp(spent)}</b></div>
+        ${planLeft>0?`<div style="display:flex;justify-content:space-between;font-size:14px;margin-top:9px"><span>Dự kiến còn chi</span><b class="num" style="color:#B07A12">${gbp(planLeft)}</b></div>`:''}
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-top:9px;padding-top:10px;border-top:1px solid var(--line)">
+          <span>${over?'Vượt ngân sách':'Còn lại sau khi trừ dự kiến'}</span>
+          <b class="num" style="color:${budget-spent-planLeft<0?'#DE5B4E':'#0F7C74'}">${gbp(Math.abs(budget-spent-planLeft))}</b></div>`:''}
+    </div>
+
+    ${planLeft>0?`<div class="card" style="margin-top:12px;padding:13px 14px;display:flex;align-items:center;gap:10px">
+      <span class="grow"><b>${pl.length} khoản dự trù chưa chi</b><div class="hint">Tổng ${gbp(planLeft)}</div></span>
+      <button class="btn ghost sm" data-act="see-plans">Xem</button>
+    </div>`:''}
+
+    <div class="sec">Thực tế đã tiêu vào đâu</div>
+    ${rows.length? `<div class="card" style="padding:6px 14px 14px">${rows.map(c=>`
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13.5px">
+          <span>${c.icon} ${esc(c.name)}</span>
+          <span class="num">${gbp(c.value)} <span style="color:var(--muted);font-size:12px">${Math.round(c.value/spent*100)}%</span></span>
+        </div>
+        <div class="bar"><i style="width:${c.value/spent*100}%"></i></div>
+      </div>`).join('')}</div>` : `<div class="empty">Chưa có khoản chi nào để đối chiếu.</div>`}`;
+}
+
+function viewCharts(ex,pl,spent,planLeft){
+  if(!ex.length && !pl.length) return `<div class="empty" style="margin-top:20px">Chưa có dữ liệu để vẽ biểu đồ.</div>`;
+  const A = '#0F7C74', P = '#F5B544';
+  const legend = `<div style="display:flex;gap:16px;justify-content:center;font-size:11.5px;color:var(--muted);margin-top:8px">
+    <span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${A};margin-right:5px"></i>Thực chi</span>
+    <span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${P};margin-right:5px"></i>Dự kiến</span>
+  </div>`;
+
+  // theo ngày
+  const dA = {}, dP = {};
+  ex.forEach(e=>{ const k=dayKey(e.datetime); dA[k]=(dA[k]||0)+toBase(e); });
+  pl.forEach(e=>{ const k=dayKey(e.datetime); dP[k]=(dP[k]||0)+toBase(e); });
+  const days = Array.from(new Set([...Object.keys(dA),...Object.keys(dP)])).sort().slice(-10);
+  const dmax = Math.max(...days.map(k=>(dA[k]||0)+(dP[k]||0)), 1);
+
+  // theo hạng mục
+  const cA = {}, cP = {};
+  ex.forEach(e=>cA[e.categoryId]=(cA[e.categoryId]||0)+toBase(e));
+  pl.forEach(e=>cP[e.categoryId]=(cP[e.categoryId]||0)+toBase(e));
+  const cats = S.categories.map(c=>({...c,a:cA[c.id]||0,p:cP[c.id]||0}))
+    .filter(c=>c.a>0||c.p>0).sort((x,y)=>(y.a+y.p)-(x.a+x.p));
+  const cmax = Math.max(...cats.map(c=>c.a+c.p), 1);
+
+  // theo thẻ
+  const mA = {}, mP = {};
+  ex.forEach(e=>mA[e.methodId]=(mA[e.methodId]||0)+toBase(e));
+  pl.forEach(e=>mP[e.methodId]=(mP[e.methodId]||0)+toBase(e));
+  const ms = S.methods.map(m=>({...m,a:mA[m.id]||0,p:mP[m.id]||0}))
+    .filter(m=>m.a>0||m.p>0).sort((x,y)=>(y.a+y.p)-(x.a+x.p));
+
+  return `
+    <div class="sec">Chi tiêu theo ngày</div>
+    <div class="card" style="padding:10px">
+      <div class="bars">${days.map(k=>{
+        const a = dA[k]||0, p = dP[k]||0, tot = a+p;
+        return `<div class="col" style="height:${Math.max(2,tot/dmax*100)}%">
+          ${p>0?`<i style="height:${p/tot*100}%;background:${P};border-radius:4px 4px 0 0"></i>`:''}
+          ${a>0?`<i style="height:${a/tot*100}%;background:${A};border-radius:${p>0?'0':'4px 4px 0 0'}"></i>`:''}
+        </div>`;
+      }).join('')}</div>
+      <div class="blabels">${days.map(k=>`<span>${dayLabel(k).slice(-5)}</span>`).join('')}</div>
+      ${legend}
+    </div>
+
+    <div class="sec">Theo hạng mục</div>
+    <div class="card" style="padding:6px 14px 14px">
+      ${cats.map(c=>`
+        <div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:13.5px">
+            <span>${c.icon} ${esc(c.name)}</span>
+            <span class="num">${gbp(c.a)}${c.p>0?` <span style="color:#B07A12">+${gbp(c.p)}</span>`:''}</span>
+          </div>
+          <div class="bar" style="display:flex">
+            <i style="width:${c.a/cmax*100}%;background:${A};border-radius:99px 0 0 99px"></i>
+            <i style="width:${c.p/cmax*100}%;background:${P};border-radius:0 99px 99px 0"></i>
+          </div>
+        </div>`).join('')}
+      ${legend}
+    </div>
+
+    <div class="sec">Theo thẻ / hình thức trả</div>
+    <div class="card">
+      ${ms.map(m=>`<div class="lrow"><span class="grow">${esc(m.name)}
+        ${m.p>0?`<div class="hint" style="color:#B07A12">dự kiến thêm ${gbp(m.p)}</div>`:''}</span>
+        <b class="num">${gbp(m.a)}</b></div>`).join('')}
+    </div>`;
+}
+
+function viewSettings(){
+  return `
+    <div class="sec">Lưu dữ liệu</div>
+    <div class="card">
+      <div class="lrow">
+        <span class="grow"><b>${storeOK?'Đang lưu bình thường':'Không lưu được'}</b>
+          <div class="hint">${storeOK?'Dữ liệu nằm trong máy bạn, mở lại vẫn còn':esc(storeMsg)}</div></span>
+        <span class="dot" style="background:${storeOK?'#0F7C74':'#DE5B4E'}"></span>
+      </div>
+      <div class="lrow"><span class="grow"><b>Xuất file CSV</b><div class="hint">Mở được bằng Excel / Numbers</div></span>
+        <button class="btn ghost sm" data-act="csv">Xuất</button></div>
+      <div class="lrow"><span class="grow"><b>Sao lưu / khôi phục</b><div class="hint">Chép dữ liệu để chuyển sang máy khác</div></span>
+        <button class="btn ghost sm" data-act="backup">Mở</button></div>
+    </div>
+
+    <div class="sec">Chuyến đi</div>
+    <div class="card">
+      <div class="lrow"><span class="grow"><b>${esc(trip().name)}</b><div class="hint">${S.trips.length} chuyến trong sổ</div></span>
+        <button class="btn ghost sm" data-act="trips">Quản lý</button></div>
+    </div>
+
+    <div class="sec">Thẻ / hình thức thanh toán</div>
+    <div class="card">
+      ${S.methods.map(m=>{
+        const used = S.expenses.some(e=>e.methodId===m.id);
+        return `<div class="lrow"><span class="grow">${esc(m.name)}</span>
+          <button class="x" data-del-method="${m.id}" ${used?'disabled style="opacity:.3"':''}>Xoá</button></div>`;
+      }).join('')}
+      <div class="addrow"><input id="new-method" placeholder="Thẻ mới, VD: Techcombank Visa">
+        <button class="btn sm" data-act="add-method">Thêm</button></div>
+    </div>
+
+    <div class="sec">Hạng mục</div>
+    <div class="card">
+      ${S.categories.map(c=>{
+        const used = S.expenses.some(e=>e.categoryId===c.id);
+        return `<div class="lrow"><span style="font-size:16px">${c.icon}</span><span class="grow">${esc(c.name)}</span>
+          <button class="x" data-del-cat="${c.id}" ${used?'disabled style="opacity:.3"':''}>Xoá</button></div>`;
+      }).join('')}
+      <div class="addrow"><input id="new-cat" placeholder="Hạng mục mới, VD: 🎁 Quà">
+        <button class="btn sm" data-act="add-cat">Thêm</button></div>
+    </div>
+
+    <div class="sec">Tỷ giá mặc định (1 GBP = ?)</div>
+    <div class="card">
+      ${S.currencies.map(c=>c.code==='GBP'
+        ? `<div class="lrow"><span class="grow"><b>GBP</b><div class="hint">Tiền gốc để tổng kết</div></span></div>`
+        : `<div class="lrow"><span class="grow"><b>${c.code}</b></span>
+            <input class="rate-in num" type="number" inputmode="decimal" value="${c.rate}" data-rate="${c.code}">
+            <button class="x" data-apply-rate="${c.code}">Áp</button>
+            <button class="x" data-del-cur="${c.code}" ${S.expenses.some(e=>e.currency===c.code)?'disabled style="opacity:.3"':''}>Xoá</button>
+          </div>`).join('')}
+      <div class="addrow"><input id="new-cur" placeholder="Mã tiền mới, VD: CHF" autocapitalize="characters">
+        <button class="btn sm" data-act="add-cur">Thêm</button></div>
+    </div>
+    <div class="hint" style="text-align:center;margin-top:10px">Nút "Áp" cập nhật tỷ giá mới cho mọi khoản cùng loại tiền trong chuyến đang mở.</div>`;
+}
+
+/* ============ sự kiện ============ */
+function bind(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ui.tab=b.dataset.tab;render();});
+  document.querySelectorAll('[data-act="add"]').forEach(b=>b.onclick=()=>openExpense(null));
+  document.querySelectorAll('[data-act="trips"]').forEach(b=>b.onclick=openTrips);
+  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openExpense(b.dataset.edit));
+  document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{ui.filter=b.dataset.filter;render();});
+  document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ui.sort=b.dataset.sort;render();});
+  document.querySelectorAll('[data-act="see-plans"]').forEach(b=>b.onclick=()=>{
+    ui.tab='chi'; ui.filter='plan'; ui.sort='time'; render();
+  });
+
+  const bi = document.getElementById('budget-in');
+  if(bi) bi.onchange = () => {
+    trip().budgetTotal = Number(bi.value)||0; save(); render();
+  };
+
+  const act = (sel,fn) => document.querySelectorAll(sel).forEach(b=>b.onclick=fn);
+
+  act('[data-act="add-method"]', ()=>{
+    const v = document.getElementById('new-method').value.trim();
+    if(!v) return;
+    S.methods.push({id:uid(),name:v}); save(); render(); toast('Đã thêm thẻ');
+  });
+  act('[data-act="add-cat"]', ()=>{
+    const raw = document.getElementById('new-cat').value.trim();
+    if(!raw) return;
+    const first = Array.from(raw)[0];
+    const hasIcon = /\p{Extended_Pictographic}/u.test(first);
+    S.categories.push({id:uid(),icon:hasIcon?first:'•',name:hasIcon?raw.slice(first.length).trim():raw});
+    save(); render(); toast('Đã thêm hạng mục');
+  });
+  act('[data-act="add-cur"]', ()=>{
+    const code = document.getElementById('new-cur').value.trim().toUpperCase();
+    if(!code || S.currencies.some(c=>c.code===code)) return;
+    S.currencies.push({code,rate:1}); save(); render();
+  });
+  act('[data-act="csv"]', exportCSV);
+  act('[data-act="backup"]', openBackup);
+
+  document.querySelectorAll('[data-del-method]').forEach(b=>b.onclick=()=>{
+    S.methods = S.methods.filter(m=>m.id!==b.dataset.delMethod); save(); render();
+  });
+  document.querySelectorAll('[data-del-cat]').forEach(b=>b.onclick=()=>{
+    S.categories = S.categories.filter(c=>c.id!==b.dataset.delCat); save(); render();
+  });
+  document.querySelectorAll('[data-del-cur]').forEach(b=>b.onclick=()=>{
+    S.currencies = S.currencies.filter(c=>c.code!==b.dataset.delCur); save(); render();
+  });
+  document.querySelectorAll('[data-rate]').forEach(inp=>inp.onchange=()=>{
+    const c = S.currencies.find(x=>x.code===inp.dataset.rate);
+    if(c){ c.rate = Number(inp.value)||1; save(); }
+  });
+  document.querySelectorAll('[data-apply-rate]').forEach(b=>b.onclick=()=>{
+    const code = b.dataset.applyRate;
+    const c = S.currencies.find(x=>x.code===code);
+    S.expenses.forEach(e=>{ if(e.tripId===trip().id && e.currency===code) e.rate = c.rate; });
+    save(); render(); toast('Đã áp tỷ giá mới');
+  });
+}
+
+/* ============ sheet: khoản chi ============ */
+function closeModal(){ document.getElementById('modal').innerHTML=''; }
+
+function openExpense(id){
+  const existing = id ? S.expenses.find(e=>e.id===id) : null;
+  const d = existing ? {...existing} : {
+    datetime: localNow(), categoryId: S.categories[0]?.id, desc:'', amount:'',
+    currency:'GBP', rate:1, methodId: S.methods[0]?.id, note:'',
+    planned: ui.filter==='plan'
+  };
+  d.planned = !!d.planned;
+
+  document.getElementById('modal').innerHTML = `
+  <div class="scrim" id="scrim"><div class="sheet" id="sheet">
+    <div class="sheet-head"><h3>${existing?'Sửa khoản':'Khoản mới'}</h3><button class="x" id="close">Đóng</button></div>
+    <div class="field">
+      <label class="lbl">Đây là</label>
+      <div class="seg">
+        <button data-type="actual" class="${d.planned?'':'on'}">Thực chi</button>
+        <button data-type="plan" class="${d.planned?'on':''}">Dự trù</button>
+      </div>
+      <div class="note" id="type-note" style="margin-top:8px;display:${d.planned?'block':'none'}">
+        Khoản dự trù không tính vào "đã chi". Đến lúc trả tiền thật, mở lại khoản này, bấm "Thực chi" và sửa số cho đúng.
+      </div>
+    </div>
+    <div class="field"><label class="lbl">Hạng mục</label>
+      <div class="chips">${S.categories.map(c=>`<button class="chip ${d.categoryId===c.id?'on':''}" data-cat="${c.id}">${c.icon} ${esc(c.name)}</button>`).join('')}</div></div>
+    <div class="field"><label class="lbl">Chi cho cái gì</label>
+      <input id="f-desc" value="${esc(d.desc)}" placeholder="VD: Vé Eurostar London – Brussels"></div>
+    <div class="grid2 field">
+      <div><label class="lbl" id="amt-lbl">${d.planned?'Số tiền dự trù':'Số tiền'}</label>
+        <input id="f-amount" type="number" inputmode="decimal" value="${d.amount}" placeholder="0.00"></div>
+      <div><label class="lbl">Loại tiền</label>
+        <select id="f-cur">${S.currencies.map(c=>`<option ${d.currency===c.code?'selected':''}>${c.code}</option>`).join('')}</select></div>
+    </div>
+    <div class="field" id="rate-box" style="display:${d.currency==='GBP'?'none':'block'}">
+      <label class="lbl">Tỷ giá — 1 GBP = <span id="rate-cur">${d.currency}</span></label>
+      <input id="f-rate" type="number" inputmode="decimal" value="${d.rate}">
+      <div class="note" style="margin-top:8px">Quy đổi: <b id="conv">—</b>. Sửa tỷ giá lúc nào cũng được.</div>
+    </div>
+    <div class="field"><label class="lbl">Trả bằng</label>
+      <select id="f-method">${S.methods.map(m=>`<option value="${m.id}" ${d.methodId===m.id?'selected':''}>${esc(m.name)}</option>`).join('')}</select></div>
+    <div class="field"><label class="lbl" id="dt-lbl">${d.planned?'Ngày dự kiến':'Ngày giờ'}</label>
+      <input id="f-dt" type="datetime-local" value="${d.datetime}"></div>
+    <div class="field"><label class="lbl">Ghi chú</label>
+      <input id="f-note" value="${esc(d.note||'')}" placeholder="Không bắt buộc"></div>
+    <button class="btn" id="f-save">${existing?'Lưu thay đổi':'Lưu'}</button>
+    ${existing?`<button class="btn danger" id="f-del" style="margin-top:10px">Xoá</button>`:''}
+  </div></div>`;
+
+  const $ = s => document.querySelector(s);
+  const upd = () => {
+    const a = Number($('#f-amount').value)||0, r = Number($('#f-rate').value)||1;
+    $('#conv').textContent = gbp(a/(r===0?1:r));
+  };
+
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{
+    d.categoryId = b.dataset.cat;
+    document.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('on', x.dataset.cat===d.categoryId));
+  });
+  $('#f-cur').onchange = () => {
+    const code = $('#f-cur').value;
+    const c = S.currencies.find(x=>x.code===code);
+    $('#rate-box').style.display = code==='GBP'?'none':'block';
+    $('#rate-cur').textContent = code;
+    $('#f-rate').value = c?c.rate:1;
+    upd();
+  };
+  $('#f-amount').oninput = upd;
+  $('#f-rate').oninput = upd;
+  upd();
+
+  document.querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{
+    const wasPlan = d.planned;
+    d.planned = b.dataset.type==='plan';
+    document.querySelectorAll('[data-type]').forEach(x=>
+      x.classList.toggle('on', (x.dataset.type==='plan')===d.planned));
+    $('#type-note').style.display = d.planned?'block':'none';
+    $('#amt-lbl').textContent = d.planned?'Số tiền dự trù':'Số tiền';
+    $('#dt-lbl').textContent = d.planned?'Ngày dự kiến':'Ngày giờ';
+    // chuyển dự trù -> thực chi thì lấy thời điểm hiện tại
+    if(wasPlan && !d.planned) $('#f-dt').value = localNow();
+  });
+
+  $('#close').onclick = closeModal;
+  $('#scrim').onclick = ev => { if(ev.target.id==='scrim') closeModal(); };
+  $('#f-save').onclick = () => {
+    const amount = Number($('#f-amount').value)||0;
+    if(amount<=0){ toast('Nhập số tiền đã nhé'); return; }
+    const dtEl = $('#f-dt');
+    const rec = {
+      id: existing?existing.id:uid(), tripId: trip().id,
+      datetime: (dtEl && dtEl.value) ? dtEl.value : localNow(),
+      categoryId: d.categoryId, desc: $('#f-desc').value.trim(),
+      amount, currency: $('#f-cur').value, rate: Number($('#f-rate').value)||1,
+      methodId: $('#f-method').value, note: $('#f-note').value.trim(),
+      planned: d.planned
+    };
+    if(existing) S.expenses = S.expenses.map(e=>e.id===rec.id?rec:e);
+    else S.expenses.push(rec);
+    save(); closeModal(); render();
+    toast(d.planned?'Đã lưu khoản dự trù':'Đã lưu khoản chi');
+  };
+  const del = $('#f-del');
+  if(del) del.onclick = () => {
+    S.expenses = S.expenses.filter(e=>e.id!==existing.id);
+    save(); closeModal(); render(); toast('Đã xoá');
+  };
+}
+
+/* ============ sheet: chuyến đi ============ */
+function openTrips(){
+  const spentOf = id => S.expenses.filter(e=>e.tripId===id).reduce((s,e)=>s+toBase(e),0);
+  document.getElementById('modal').innerHTML = `
+  <div class="scrim" id="scrim"><div class="sheet">
+    <div class="sheet-head"><h3>Chuyến đi</h3><button class="x" id="close">Đóng</button></div>
+    <div class="card">
+      ${S.trips.map(t=>`<div class="lrow">
+        <button class="grow" style="border:0;background:none;text-align:left;font:inherit;padding:0" data-pick="${t.id}">
+          <b style="${t.id===S.activeTripId?'color:#0F7C74':''}">${esc(t.name)}</b>
+          <div class="hint">${S.expenses.filter(e=>e.tripId===t.id).length} khoản · ${gbp(spentOf(t.id))}</div>
+        </button>
+        <button class="x" data-rename="${t.id}">Sửa tên</button>
+        <button class="x" data-deltrip="${t.id}" ${S.trips.length===1?'disabled style="opacity:.3"':''}>Xoá</button>
+      </div>`).join('')}
+      <div class="addrow"><input id="new-trip" placeholder="Chuyến mới, VD: Về Việt Nam Tết">
+        <button class="btn sm" id="add-trip">Tạo</button></div>
+    </div>
+    <div class="hint" style="text-align:center;margin-top:10px">Xoá chuyến sẽ xoá luôn các khoản chi của chuyến đó.</div>
+  </div></div>`;
+
+  document.getElementById('close').onclick = closeModal;
+  document.getElementById('scrim').onclick = ev => { if(ev.target.id==='scrim') closeModal(); };
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
+    S.activeTripId = b.dataset.pick; save(); closeModal(); render();
+  });
+  document.querySelectorAll('[data-rename]').forEach(b=>b.onclick=()=>{
+    const t = S.trips.find(x=>x.id===b.dataset.rename);
+    const v = prompt('Tên chuyến', t.name);
+    if(v && v.trim()){ t.name = v.trim(); save(); openTrips(); render(); }
+  });
+  document.querySelectorAll('[data-deltrip]').forEach(b=>b.onclick=()=>{
+    const t = S.trips.find(x=>x.id===b.dataset.deltrip);
+    if(!confirm('Xoá chuyến "'+t.name+'" và toàn bộ khoản chi của nó?')) return;
+    S.trips = S.trips.filter(x=>x.id!==t.id);
+    S.expenses = S.expenses.filter(e=>e.tripId!==t.id);
+    if(S.activeTripId===t.id) S.activeTripId = S.trips[0].id;
+    save(); openTrips(); render();
+  });
+  document.getElementById('add-trip').onclick = () => {
+    const v = document.getElementById('new-trip').value.trim();
+    if(!v) return;
+    const t = {id:uid(),name:v,budgetTotal:0};
+    S.trips.push(t); S.activeTripId = t.id; save(); closeModal(); render(); toast('Đã tạo chuyến');
+  };
+}
+
+/* ============ sao lưu & CSV ============ */
+function openBackup(){
+  document.getElementById('modal').innerHTML = `
+  <div class="scrim" id="scrim"><div class="sheet">
+    <div class="sheet-head"><h3>Sao lưu / khôi phục</h3><button class="x" id="close">Đóng</button></div>
+    <label class="lbl">Dữ liệu hiện tại</label>
+    <textarea id="bk" rows="5" readonly style="font-size:11px">${esc(JSON.stringify(S))}</textarea>
+    <button class="btn ghost sm" id="copy" style="margin-top:8px">Chép</button>
+    <label class="lbl" style="margin-top:18px">Khôi phục</label>
+    <textarea id="rs" rows="4" placeholder="Dán dữ liệu sao lưu vào đây" style="font-size:11px"></textarea>
+    <button class="btn ghost sm" id="restore" style="margin-top:8px">Khôi phục</button>
+  </div></div>`;
+  document.getElementById('close').onclick = closeModal;
+  document.getElementById('scrim').onclick = ev => { if(ev.target.id==='scrim') closeModal(); };
+  document.getElementById('copy').onclick = async () => {
+    try{ await navigator.clipboard.writeText(JSON.stringify(S)); toast('Đã chép'); }
+    catch(e){ document.getElementById('bk').select(); toast('Bấm giữ để copy'); }
+  };
+  document.getElementById('restore').onclick = () => {
+    try{
+      const p = JSON.parse(document.getElementById('rs').value);
+      if(!p || !p.trips) throw new Error('sai định dạng');
+      S = p; save(); closeModal(); render(); toast('Đã khôi phục');
+    }catch(e){ toast('Dữ liệu không hợp lệ'); }
+  };
+}
+
+function exportCSV(){
+  const rows = [['Ngày giờ','Hạng mục','Nội dung','Số tiền','Tiền tệ','Tỷ giá','Quy đổi GBP','Thẻ','Ghi chú','Chuyến']];
+  S.expenses.forEach(e=>{
+    const t = S.trips.find(x=>x.id===e.tripId);
+    rows.push([e.datetime, catOf(e.categoryId)?.name||'', e.desc||'', e.amount, e.currency, e.rate,
+      toBase(e).toFixed(2), methodOf(e.methodId)?.name||'', e.note||'', t?t.name:'']);
+  });
+  const csv = '\uFEFF' + rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'chi-tieu-du-lich.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Đã xuất CSV');
+}
+
+/* ============ chạy ============ */
+S = load();
+render();
+</script>
+</body>
+</html>
